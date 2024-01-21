@@ -3,8 +3,6 @@ const path = require('path');
 
 //dunno why we do that sphagetty code and not use async/await
 const copyDir = (dirPath, destPath) => {
-  destPath = path.join(__dirname, destPath);
-  dirPath = path.join(__dirname, dirPath);
   fs.rm(destPath, { recursive: true }, () => {
     fs.mkdir(destPath, { recursive: true }, () => {
       fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
@@ -33,7 +31,7 @@ const copyDir = (dirPath, destPath) => {
 
 //invoke
 function init() {
-  copyDir('files', 'files-copy');
+  copyDir(path.join(__dirname, 'files'), path.join(__dirname, 'files-copy'));
 }
 if (require.main === module) {
   init();
