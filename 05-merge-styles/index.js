@@ -1,33 +1,24 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
-const mergeStyles = (dirPath, destPath) => {
-  const writeStream = fs.createWriteStream(destPath);
-  writeStream.on('error', (err) => {
-    console.error(err);
-  });
-  fs.readdir(dirPath, { withFileTypes: true }, (err, files) => {
-    if (err) {
-      console.error(err);
-      return;
+const mergeStyles = async (dirPath, destPath) => {
+  let data = '';
+  const files = await fs.readdir(dirPath, { withFileTypes: true });
+  for (const file of files) {
+    if (file.isFile() && path.extname(file.name) === '.css') {
+      let fileData = await fs.readFile(path.join(dirPath, file.name), 'utf-8');
+      data += fileData;
     }
-    files.forEach((file) => {
-      if (file.isFile() && path.extname(file.name) === '.css') {
-        const readStream = fs.createReadStream(path.join(dirPath, file.name));
-        readStream.on('data', (chunk) => {
-          writeStream.write(chunk.toString());
-        });
-      }
-    });
-  });
+  }
+  await fs.writeFile(destPath, data);
 };
 
-function init() {
-  mergeStyles(
+const init = async () => {
+  await mergeStyles(
     path.join(__dirname, 'styles'),
     path.join(__dirname, 'project-dist', 'bundle.css'),
   );
-}
+};
 if (require.main === module) {
   init();
 }

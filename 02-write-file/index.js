@@ -12,13 +12,19 @@ const rl = readline.createInterface({
 });
 
 rl.on('SIGINT', () => {
-  console.log('Thanks for using our SuperPupper CLI tool!');
+  console.log('\nThanks for using our SuperPupper CLI tool!');
+  let data = rl.history;
+  if (rl.history.length > 0) {
+    if (data[0] == 'exit') {
+      data.shift();
+    }
+  }
+  stream.write(data.reverse().join('\n').toString());
   rl.close();
 });
-
+rl.on('line', (prompt) => {
+  if (prompt == 'exit') rl.emit('SIGINT');
+});
 rl.question('What would you like to write to the file? \n', (answer) => {
   stream.write(answer);
-});
-rl.on('line', (line) => {
-  stream.write(`\n${line}`);
 });
